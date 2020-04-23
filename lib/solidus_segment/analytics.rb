@@ -6,9 +6,11 @@ module SolidusSegment
 
     def initialize(user: nil,
                    anonymous_id: nil,
+                   client_id: nil,
                    backend: SolidusSegment.configuration.segment_backend)
       @user = user
       @anonymous_id = anonymous_id
+      @client_id = client_id
       @backend = backend
     end
 
@@ -18,13 +20,14 @@ module SolidusSegment
 
     private
 
-    attr_reader :user, :anonymous_id
+    attr_reader :user, :anonymous_id, :client_id
 
     def identify_params
       {
         user_id: user&.id,
         anonymous_id: anonymous_id,
         traits: traits,
+        integrations: integrations
       }.compact
     end
 
@@ -32,6 +35,12 @@ module SolidusSegment
       return unless user
 
       Serializers::TraitsSerializer.new(user).to_h
+    end
+
+    def integrations
+      return unless client_id
+
+      Hash['Google Analytics': { clientId: client_id }]
     end
   end
 end

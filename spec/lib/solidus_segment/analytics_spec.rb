@@ -58,5 +58,17 @@ RSpec.describe SolidusSegment::Analytics do
 
       expect(backend).to have_received(:identify).with(anonymous_id: 'abc')
     end
+
+    it "when client_id is given identifies the user also with integrations" do
+      backend = instance_double('Backend::Analytics')
+      allow(backend).to receive(:identify)
+
+      described_class.new(anonymous_id: 'abc', client_id: '123', backend: backend).identify
+
+      expect(backend).to have_received(:identify).with(
+        anonymous_id: 'abc',
+        integrations: { "Google Analytics": { clientId: "123" } }
+      )
+    end
   end
 end
