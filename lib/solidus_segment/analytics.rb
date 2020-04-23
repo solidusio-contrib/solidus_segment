@@ -24,7 +24,14 @@ module SolidusSegment
       {
         user_id: user&.id,
         anonymous_id: anonymous_id,
-      }
+        traits: traits,
+      }.compact
+    end
+
+    def traits
+      return unless user
+
+      Serializers::TraitsSerializer.new(user).to_h
     end
   end
 end

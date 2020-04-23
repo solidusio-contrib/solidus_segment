@@ -37,13 +37,26 @@ RSpec.describe SolidusSegment::Analytics do
       end
     end
 
-    it "identifies the user by id and anonymous_id" do
+    it "identifies the user by id and anonymous_id with user traits" do
       backend = instance_double('Backend::Analytics')
       allow(backend).to receive(:identify)
 
       described_class.new(user: user, anonymous_id: 'abc', backend: backend).identify
 
-      expect(backend).to have_received(:identify).with(user_id: user.id, anonymous_id: 'abc')
+      expect(backend).to have_received(:identify).with(
+        user_id: user.id,
+        anonymous_id: 'abc',
+        traits: instance_of(Hash)
+      )
+    end
+
+    it "when user isn't given identifies the user without user_id and traits" do
+      backend = instance_double('Backend::Analytics')
+      allow(backend).to receive(:identify)
+
+      described_class.new(anonymous_id: 'abc', backend: backend).identify
+
+      expect(backend).to have_received(:identify).with(anonymous_id: 'abc')
     end
   end
 end
