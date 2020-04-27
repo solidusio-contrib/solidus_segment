@@ -70,6 +70,18 @@ RSpec.describe SolidusSegment::Analytics do
         integrations: { "Google Analytics": { clientId: "123" } }
       )
     end
+
+    it "when traits are given merges it with the common traits" do
+      backend = instance_double('Backend::Analytics')
+      allow(backend).to receive(:identify)
+
+      described_class.new(anonymous_id: 'abc', backend: backend).identify(traits: { email: "admin@example.com" })
+
+      expect(backend).to have_received(:identify).with(
+        anonymous_id: 'abc',
+        traits: { email: "admin@example.com" }
+      )
+    end
   end
 
   describe "#track_order_completed" do

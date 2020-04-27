@@ -14,8 +14,8 @@ module SolidusSegment
       @backend = backend
     end
 
-    def identify
-      backend.identify(identify_params)
+    def identify(**args)
+      backend.identify(common_params.merge(traits: traits).merge(args).compact)
     end
 
     def track(event, **args)
@@ -37,10 +37,6 @@ module SolidusSegment
         anonymous_id: anonymous_id,
         integrations: integrations
       }
-    end
-
-    def identify_params
-      { traits: traits }.merge(common_params).compact
     end
 
     def traits
