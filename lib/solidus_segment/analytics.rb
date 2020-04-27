@@ -21,7 +21,7 @@ module SolidusSegment
     end
 
     def track_order_completed(order:)
-      identify
+      identify(traits: { email: order.email })
       track Events::ORDER_COMPLETED, properties: Serializers::OrderSerializer.new(order).to_h
     end
 
