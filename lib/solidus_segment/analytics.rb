@@ -5,12 +5,10 @@ module SolidusSegment
     attr_reader :backend
 
     def initialize(user: nil,
-                   anonymous_id: nil,
-                   client_id: nil,
+                   request: nil,
                    backend: SolidusSegment.configuration.segment_backend)
       @user = user
-      @anonymous_id = anonymous_id
-      @client_id = client_id
+      @common_params = CommonParameters.new(user: user, request: request).to_h
       @backend = backend
     end
 
@@ -29,26 +27,12 @@ module SolidusSegment
 
     private
 
-    attr_reader :user, :anonymous_id, :client_id
-
-    def common_params
-      {
-        user_id: user&.id,
-        anonymous_id: anonymous_id,
-        integrations: integrations
-      }
-    end
+    attr_reader :user, :common_params
 
     def traits
       return unless user
 
       Serializers::TraitsSerializer.new(user).to_h
-    end
-
-    def integrations
-      return unless client_id
-
-      Hash['Google Analytics': { clientId: client_id }]
     end
   end
 end

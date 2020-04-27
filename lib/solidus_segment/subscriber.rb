@@ -8,7 +8,7 @@ module SolidusSegment
 
     def track_order_completed(event)
       SolidusSegment::Analytics.new(
-        SolidusEventParser.new(event.payload).to_params
+        user: event.payload[:user], request: event.payload[:request]
       ).track_order_completed(order: event.payload[:order])
     end
   end
