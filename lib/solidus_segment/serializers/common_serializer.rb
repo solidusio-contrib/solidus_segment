@@ -15,6 +15,7 @@ module SolidusSegment
         if request
           parameters[:anonymous_id] = anonymous_id
           parameters[:integrations] = common_integrations
+          parameters[:context] = common_context
         end
 
         parameters.compact
@@ -28,6 +29,10 @@ module SolidusSegment
         integrations = {}
         integrations["Google Analytics"] = { clientId: client_id } if client_id
         integrations.empty? ? nil : integrations
+      end
+
+      def common_context
+        { user_agent: request.user_agent }
       end
 
       def anonymous_id

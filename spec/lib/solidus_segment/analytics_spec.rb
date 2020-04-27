@@ -46,9 +46,11 @@ RSpec.describe SolidusSegment::Analytics do
       described_class.new(user: user, request: request, backend: backend).identify
 
       expect(backend).to have_received(:identify).with(
-        user_id: user.id,
-        anonymous_id: 'abc',
-        traits: instance_of(Hash)
+        hash_including(
+          user_id: user.id,
+          anonymous_id: 'abc',
+          traits: instance_of(Hash)
+        )
       )
     end
 
@@ -58,7 +60,7 @@ RSpec.describe SolidusSegment::Analytics do
 
       described_class.new(request: request, backend: backend).identify
 
-      expect(backend).to have_received(:identify).with(anonymous_id: 'abc')
+      expect(backend).to have_received(:identify).with(hash_including(anonymous_id: 'abc'))
     end
 
     it "merges common parameters with the given arguments" do

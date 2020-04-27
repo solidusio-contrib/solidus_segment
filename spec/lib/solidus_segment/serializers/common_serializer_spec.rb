@@ -31,6 +31,9 @@ RSpec.describe SolidusSegment::Serializers::CommonSerializer do
           "Google Analytics" => {
             clientId: "1033501218.1368477899"
           }
+        },
+        context: {
+          user_agent: "Rails Testing"
         }
       )
     end
