@@ -33,7 +33,8 @@ RSpec.describe SolidusSegment::Analytics::CommonParameters do
           }
         },
         context: {
-          user_agent: "Rails Testing"
+          user_agent: "Rails Testing",
+          ip: "0.0.0.0"
         }
       })
     end
