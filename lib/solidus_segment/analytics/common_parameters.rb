@@ -11,7 +11,15 @@ module SolidusSegment
       def to_h
         parameters = {}
         parameters[:user_id] = user&.id
-        parameters.merge!({ anonymous_id: anonymous_id, integrations: common_integrations }) if request
+
+        if request
+          parameters.merge!({
+            anonymous_id: anonymous_id,
+            integrations: common_integrations,
+            context: common_context,
+          })
+        end
+
         parameters.compact
       end
 
@@ -23,6 +31,10 @@ module SolidusSegment
         integrations = {}
         integrations['Google Analytics'] = { clientId: client_id } if client_id
         integrations.empty? ? nil : integrations
+      end
+
+      def common_context
+        { user_agent: request.user_agent }
       end
 
       def anonymous_id
