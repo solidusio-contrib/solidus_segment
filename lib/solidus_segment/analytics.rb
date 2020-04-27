@@ -22,7 +22,7 @@ module SolidusSegment
 
     def track_order_completed(order:)
       identify
-      track "Order Completed", properties: Serializers::OrderSerializer.new(order).to_h
+      track Events::ORDER_COMPLETED, properties: Serializers::OrderSerializer.new(order).to_h
     end
 
     private
