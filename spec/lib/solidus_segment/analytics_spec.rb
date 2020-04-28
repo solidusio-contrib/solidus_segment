@@ -81,13 +81,23 @@ RSpec.describe SolidusSegment::Analytics do
   end
 
   describe "#track_order_completed" do
-    it "identifies the user" do
-      analytics = described_class.new(request: request)
+    it "identifies the user without arguments when user is given" do
+      analytics = described_class.new(user: user, request: request)
       allow(analytics).to receive(:identify)
 
       analytics.track_order_completed(order: build_stubbed(:order))
 
-      expect(analytics).to have_received(:identify)
+      expect(analytics).to have_received(:identify).with({})
+    end
+
+    it "identifies the user with traits from the order when user isn't given" do
+      order = build_stubbed(:order)
+      analytics = described_class.new(request: request)
+      allow(analytics).to receive(:identify)
+
+      analytics.track_order_completed(order: order)
+
+      expect(analytics).to have_received(:identify).with(hash_including(:traits))
     end
 
     it "sends the 'Order Completed' event with properties" do
