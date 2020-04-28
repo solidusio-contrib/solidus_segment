@@ -18,17 +18,29 @@ module SolidusSegment
       backend.identify(identify_params)
     end
 
+    def track(event, **args)
+      backend.track(common_params.merge(event: event).merge(args).compact)
+    end
+
+    def track_order_completed(order:)
+      identify
+      track "Order Completed", properties: Serializers::OrderSerializer.new(order).to_h
+    end
+
     private
 
     attr_reader :user, :anonymous_id, :client_id
 
-    def identify_params
+    def common_params
       {
         user_id: user&.id,
         anonymous_id: anonymous_id,
-        traits: traits,
         integrations: integrations
-      }.compact
+      }
+    end
+
+    def identify_params
+      { traits: traits }.merge(common_params).compact
     end
 
     def traits

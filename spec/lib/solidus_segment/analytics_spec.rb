@@ -71,4 +71,49 @@ RSpec.describe SolidusSegment::Analytics do
       )
     end
   end
+
+  describe "#track_order_completed" do
+    it "identifies the user" do
+      analytics = described_class.new(anonymous_id: "abc")
+      allow(analytics).to receive(:identify)
+      allow(analytics).to receive(:track)
+
+      analytics.track_order_completed(order: build_stubbed(:order))
+
+      expect(analytics).to have_received(:identify)
+    end
+
+    it "sends the 'Order Completed' event with properties" do
+      backend = object_spy("Backend::Analytics")
+
+      described_class.new(backend: backend).
+        track_order_completed(order: build_stubbed(:order))
+
+      expect(backend.as_null_object).to have_received(:track).with(
+        hash_including(event: "Order Completed", properties: an_instance_of(Hash))
+      )
+    end
+
+    it "sends the user by id and anonymous_id" do
+      backend = object_spy("Backend::Analytics")
+
+      described_class.new(user: user, anonymous_id: "abc", backend: backend).
+        track_order_completed(order: build_stubbed(:order))
+
+      expect(backend.as_null_object).to have_received(:track).with(
+        hash_including(user_id: user.id, anonymous_id: "abc")
+      )
+    end
+
+    it "when client_id is given sends the integrations" do
+      backend = object_spy("Backend::Analytics")
+
+      described_class.new(anonymous_id: "abc", client_id: "123", backend: backend).
+        track_order_completed(order: build_stubbed(:order))
+
+      expect(backend.as_null_object).to have_received(:track).with(
+        hash_including(integrations: { "Google Analytics": { clientId: "123" } })
+      )
+    end
+  end
 end
