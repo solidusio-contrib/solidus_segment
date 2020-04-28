@@ -4,10 +4,12 @@ require "spec_helper"
 
 RSpec.describe SolidusSegment::Analytics do
   let(:user) { build_stubbed(:user) }
+  let(:request) { ActionDispatch::TestRequest.create }
 
   before do
     SolidusSegment.configuration.segment_write_key = 123
     SolidusSegment.configuration.segment_backend = nil
+    request.session_options[:id] = "abc"
   end
 
   it "uses the configured backend by default" do
@@ -33,7 +35,7 @@ RSpec.describe SolidusSegment::Analytics do
       end
 
       it "doesn't raise an error if only the anonymous_id is given" do
-        expect{ described_class.new(anonymous_id: 'abc').identify }.not_to raise_error
+        expect{ described_class.new(request: request).identify }.not_to raise_error
       end
     end
 
@@ -41,7 +43,7 @@ RSpec.describe SolidusSegment::Analytics do
       backend = instance_double('Backend::Analytics')
       allow(backend).to receive(:identify)
 
-      described_class.new(user: user, anonymous_id: 'abc', backend: backend).identify
+      described_class.new(user: user, request: request, backend: backend).identify
 
       expect(backend).to have_received(:identify).with(
         user_id: user.id,
@@ -54,21 +56,9 @@ RSpec.describe SolidusSegment::Analytics do
       backend = instance_double('Backend::Analytics')
       allow(backend).to receive(:identify)
 
-      described_class.new(anonymous_id: 'abc', backend: backend).identify
+      described_class.new(request: request, backend: backend).identify
 
       expect(backend).to have_received(:identify).with(anonymous_id: 'abc')
-    end
-
-    it "when client_id is given identifies the user also with integrations" do
-      backend = instance_double('Backend::Analytics')
-      allow(backend).to receive(:identify)
-
-      described_class.new(anonymous_id: 'abc', client_id: '123', backend: backend).identify
-
-      expect(backend).to have_received(:identify).with(
-        anonymous_id: 'abc',
-        integrations: { "Google Analytics": { clientId: "123" } }
-      )
     end
 
     it "merges common parameters with the given arguments" do
@@ -90,9 +80,8 @@ RSpec.describe SolidusSegment::Analytics do
 
   describe "#track_order_completed" do
     it "identifies the user" do
-      analytics = described_class.new(anonymous_id: "abc")
+      analytics = described_class.new(request: request)
       allow(analytics).to receive(:identify)
-      allow(analytics).to receive(:track)
 
       analytics.track_order_completed(order: build_stubbed(:order))
 
@@ -113,22 +102,11 @@ RSpec.describe SolidusSegment::Analytics do
     it "sends the user by id and anonymous_id" do
       backend = object_spy("Backend::Analytics")
 
-      described_class.new(user: user, anonymous_id: "abc", backend: backend).
+      described_class.new(user: user, request: request, backend: backend).
         track_order_completed(order: build_stubbed(:order))
 
       expect(backend.as_null_object).to have_received(:track).with(
         hash_including(user_id: user.id, anonymous_id: "abc")
-      )
-    end
-
-    it "when client_id is given sends the integrations" do
-      backend = object_spy("Backend::Analytics")
-
-      described_class.new(anonymous_id: "abc", client_id: "123", backend: backend).
-        track_order_completed(order: build_stubbed(:order))
-
-      expect(backend.as_null_object).to have_received(:track).with(
-        hash_including(integrations: { "Google Analytics": { clientId: "123" } })
       )
     end
   end
