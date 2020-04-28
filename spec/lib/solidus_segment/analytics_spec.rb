@@ -70,6 +70,22 @@ RSpec.describe SolidusSegment::Analytics do
         integrations: { "Google Analytics": { clientId: "123" } }
       )
     end
+
+    it "merges common parameters with the given arguments" do
+      backend = instance_double("Backend::Analytics")
+      allow(backend).to receive(:identify)
+
+      described_class.new(user: user, backend: backend).identify(
+        traits: { email: "email@example.com" },
+        integrations: { custom: "custom_param" }
+      )
+
+      expect(backend).to have_received(:identify).with(
+        user_id: user.id,
+        traits: { email: "email@example.com" },
+        integrations: { custom: "custom_param" }
+      )
+    end
   end
 
   describe "#track_order_completed" do
