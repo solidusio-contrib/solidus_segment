@@ -3,23 +3,20 @@
 module SolidusSegment
   module Serializers
     class ProductSerializer
-      def initialize(line_item)
-        @line_item = line_item
+      def initialize(product)
+        @product = product
       end
 
       def to_h
-        {
-          id: line_item.variant.id,
-          sku: line_item.variant.sku,
-          name: line_item.product.name,
-          price: line_item.price,
-          quantity: line_item.quantity,
-        }.compact
+        return VariantSerializer.new(product).to_h if product.is_a? Spree::Variant
+        return LineItemSerializer.new(product).to_h if product.is_a? Spree::LineItem
+
+        fail ArgumentError, 'Passed product should be a variant or a line item!'
       end
 
       private
 
-      attr_reader :line_item
+      attr_reader :product
     end
   end
 end
