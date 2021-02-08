@@ -23,7 +23,7 @@ module SolidusSegment
       attr_reader :user
 
       def address
-        @address ||= user.default_address
+        @address ||= user.ship_address
       end
     end
   end
