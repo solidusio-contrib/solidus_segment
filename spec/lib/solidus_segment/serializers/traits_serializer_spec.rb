@@ -7,7 +7,7 @@ RSpec.describe SolidusSegment::Serializers::TraitsSerializer do
 
   describe "#to_h" do
     it "returns an hash with reserved traits keys" do
-      user.default_address = create(:address, zipcode: '12345')
+      user.ship_address = create(:address, zipcode: '12345')
       serializer = described_class.new(user).to_h
 
       expect(serializer).to include(

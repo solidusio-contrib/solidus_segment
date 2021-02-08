@@ -13,5 +13,3 @@ module SolidusSegment
     end
   end
 end
-
-SolidusSegment::Subscriber.subscribe!
