@@ -32,7 +32,7 @@ module SolidusSegment
       end
 
       def common_context
-        { user_agent: request.user_agent, ip: request.remote_addr }
+        { userAgent: request.user_agent, ip: request.remote_addr }
       end
 
       def anonymous_id
