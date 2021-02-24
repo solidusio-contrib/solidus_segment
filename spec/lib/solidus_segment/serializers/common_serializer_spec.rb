@@ -33,7 +33,7 @@ RSpec.describe SolidusSegment::Serializers::CommonSerializer do
           }
         },
         context: {
-          user_agent: "Rails Testing",
+          userAgent: "Rails Testing",
           ip: "0.0.0.0"
         }
       )
